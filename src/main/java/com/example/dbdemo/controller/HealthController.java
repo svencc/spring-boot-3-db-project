@@ -29,7 +29,7 @@ public class HealthController {
     })
     @GetMapping(path = "")
     public ResponseEntity<Void> health() {
-        log.debug("Requested GET /health");
+        log.info("Requested GET /health");
 
         return ResponseEntity.status(HttpStatus.OK)
                 .cacheControl(CacheControl.noCache())

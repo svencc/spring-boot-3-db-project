@@ -1,0 +1,1 @@
+CREATE DATABASE spring_db_project;

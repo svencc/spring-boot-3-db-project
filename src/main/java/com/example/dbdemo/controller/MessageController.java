@@ -1,6 +1,8 @@
 package com.example.dbdemo.controller;
 
+import com.example.dbdemo.dto.MessageDto;
 import com.example.dbdemo.entity.Message;
+import com.example.dbdemo.mapper.MessageMapper;
 import com.example.dbdemo.repository.MessageRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,11 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -29,21 +30,48 @@ public class MessageController {
     private final MessageRepository messageRepository;
 
     @Operation(
-            summary = "Creates a message.",
-            description = "Returns 200 if alive."
+            summary = "List all messages.",
+            description = "Returns all"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "O.K.")
     })
     @GetMapping(path = "")
-    public ResponseEntity<Void> health() {
-        log.info("Requested GET /health");
+    public ResponseEntity<List<MessageDto>> listMessages() {
+        log.info("Requested GET /message");
 
-        final List<Message> all = messageRepository.findAll();
+        final List<MessageDto> allMessages = messageRepository.findAll().stream()
+                .map(MessageMapper.INSTANCE::toDto)
+                .collect(Collectors.toList());
 
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity
+                .status(HttpStatus.OK)
                 .cacheControl(CacheControl.noCache())
+                .body(allMessages);
+    }
+
+    @Operation(
+            summary = "List all messages.",
+            description = "Returns all"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "O.K.")
+    })
+    @PostMapping(path = "")
+    public ResponseEntity<MessageDto> createMessage(
+            @RequestBody final MessageDto message
+    ) {
+        log.info("Requested POST /message");
+
+        final Message newMessage = Message.builder()
+                .message(message.getMessage())
                 .build();
+        final Message savedMessage = messageRepository.save(newMessage);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noCache())
+                .body(MessageMapper.INSTANCE.toDto(savedMessage));
     }
 
 }

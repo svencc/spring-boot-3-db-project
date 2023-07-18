@@ -1,10 +1,15 @@
 package com.example.dbdemo.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Nationalized;
+import org.springframework.data.domain.Persistable;
+
+// Niemals @Data an Entitäten machen; hashCode und equals wird sonst überschrieben; den lombok-default wollen wir nicht;
+// wir implementieren das selbst
+@Getter
+@Setter
+
 
 @Entity
 @Builder
@@ -13,7 +18,7 @@ import org.hibernate.annotations.Nationalized;
 @Table(indexes = {
         @Index(name = "IDX_message", columnList = "message", unique = false)
 })
-public class Message {
+public class Message implements Persistable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -23,5 +28,11 @@ public class Message {
     @Nationalized
     @Column(insertable = true, updatable = true, nullable = false, length = 255)
     private String message;
+
+    // das später auch noch erklären
+    @Override
+    public boolean isNew() {
+        return id == null;
+    }
 
 }

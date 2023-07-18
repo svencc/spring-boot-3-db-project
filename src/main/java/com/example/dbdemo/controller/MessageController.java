@@ -2,8 +2,10 @@ package com.example.dbdemo.controller;
 
 import com.example.dbdemo.dto.MessageDto;
 import com.example.dbdemo.entity.Message;
+import com.example.dbdemo.entity.Sender;
 import com.example.dbdemo.mapper.MessageMapper;
 import com.example.dbdemo.repository.MessageRepository;
+import com.example.dbdemo.repository.SenderRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,6 +30,8 @@ public class MessageController {
 
     @NonNull
     private final MessageRepository messageRepository;
+    @NonNull
+    private final SenderRepository senderRepository;
 
     @Operation(
             summary = "List all messages.",
@@ -63,9 +67,21 @@ public class MessageController {
     ) {
         log.info("Requested POST /message");
 
+        final Sender sender = senderRepository.findByName(message.getSenderName())
+                .orElseGet(() -> {
+                    final Sender newSender = Sender.builder()
+                            .name(message.getSenderName())
+                            .build();
+
+                    return senderRepository.save(newSender);
+                });
+
+
         final Message newMessage = Message.builder()
                 .message(message.getMessage())
+                .sender(sender)
                 .build();
+
         final Message savedMessage = messageRepository.save(newMessage);
 
         return ResponseEntity

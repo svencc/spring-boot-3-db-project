@@ -30,6 +30,7 @@ public class Message implements Persistable<Long> {
     private String message;
 
     @ManyToOne
+    @JoinColumn(name = "sender_id")
     private Sender sender;
 
     // das später auch noch erklären

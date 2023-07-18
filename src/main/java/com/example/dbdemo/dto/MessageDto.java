@@ -24,4 +24,8 @@ public class MessageDto {
     @JsonProperty
     private String message;
 
+    @Schema
+    @JsonProperty
+    private String senderName;
+
 }

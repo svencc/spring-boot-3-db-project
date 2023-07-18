@@ -31,7 +31,7 @@ public class Sender implements Persistable<Long> {
     @Column(insertable = true, updatable = true, nullable = false, length = 255)
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "sender")
     private Set<Message> message;
 
     // das später auch noch erklären

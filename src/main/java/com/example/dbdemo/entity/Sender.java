@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.Nationalized;
 import org.springframework.data.domain.Persistable;
 
+import java.util.Set;
+
 // Niemals @Data an Entitäten machen; hashCode und equals wird sonst überschrieben; den lombok-default wollen wir nicht;
 // wir implementieren das selbst
 @Getter
@@ -16,9 +18,9 @@ import org.springframework.data.domain.Persistable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(indexes = {
-        @Index(name = "IDX_message", columnList = "message", unique = false)
+        @Index(name = "IDX_name", columnList = "name", unique = false)
 })
-public class Message implements Persistable<Long> {
+public class Sender implements Persistable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -27,10 +29,10 @@ public class Message implements Persistable<Long> {
 
     @Nationalized
     @Column(insertable = true, updatable = true, nullable = false, length = 255)
-    private String message;
+    private String name;
 
-    @ManyToOne
-    private Sender sender;
+    @OneToMany
+    private Set<Message> message;
 
     // das später auch noch erklären
     @Override
